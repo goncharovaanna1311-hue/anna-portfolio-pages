@@ -1,32 +1,28 @@
 const dialog = document.querySelector('#request-dialog');
-const form = document.querySelector('#request-form');
-const status = document.querySelector('.form-status');
-const fallback = document.querySelector('.copy-fallback');
-const sendButton = document.querySelector('.send-button');
-const copyButton = document.querySelector('.copy-button');
-const notice = document.querySelector('#form-notice');
-const contactNotice = document.querySelector('#contact-notice');
-let sending = false;
-let trigger;
-
-function refreshInquiryAvailability() {
-  sendButton.disabled = false;
-  notice.textContent = 'Заполните форму, чтобы подготовить письмо на annay22_gav@mail.ru. Отправьте его в своём почтовом приложении или скопируйте текст заявки.';
-  document.querySelector('.form-footnote').textContent = 'Письмо отправляется только после вашего подтверждения в почтовом приложении.';
-}
-refreshInquiryAvailability();
-
+const frame = document.querySelector('#inquiry-frame');
+const formState = document.querySelector('#form-loading');
+const formEndpoint = 'https://script.google.com/macros/s/AKfycby8WighbvojWtXMi9hz6z6rIYX7qYdt0IeV2iQJoUy00vS96GZE1WenIVXxfjqZDu7q/exec';
+let trigger, initialized = false, loadingTimer;
+frame.addEventListener('load', () => {
+  clearTimeout(loadingTimer);
+  formState.textContent = 'Если форма не появилась, откройте её по ссылке ниже или напишите на email.';
+});
 document.querySelectorAll('[data-request]').forEach(button => {
   button.addEventListener('click', () => {
     trigger = button;
-    status.textContent = '';
-    fallback.hidden = true;
-    if (button.dataset.service && !form.elements.task.value.trim()) {
-      form.elements.task.value = `Интересует ${button.dataset.service.toLowerCase()}. `;
+    if (!initialized) {
+      const url = new URL(formEndpoint);
+      const services = {'Лендинг':'Лендинги','Чат-бот':'Чат-боты','Калькулятор':'Калькуляторы','Трекер':'Трекеры','Дашборд':'Дашборды'};
+      if (button.dataset.service) url.searchParams.set('service', services[button.dataset.service] || '');
+      frame.src = url.href;
+      document.querySelector('#open-inquiry-form').href = url.href;
+      initialized = true;
+      formState.textContent = 'Загружаем форму…';
+      loadingTimer = setTimeout(() => { formState.textContent = 'Форма загружается дольше обычного. Откройте её по ссылке ниже или напишите на email.'; }, 15000);
     }
     dialog.showModal();
+    dialog.scrollTop = 0;
     document.body.classList.add('modal-open');
-    if (!sending) refreshInquiryAvailability();
   });
 });
 document.querySelector('.close-dialog').addEventListener('click', () => dialog.close());
@@ -34,48 +30,7 @@ dialog.addEventListener('click', event => {
   const rect = dialog.getBoundingClientRect();
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
 });
-dialog.addEventListener('close', () => {
-  document.body.classList.remove('modal-open');
-  trigger?.focus();
-});
-function getInquiry() {
-  const name = form.elements.name.value.trim();
-  const task = form.elements.task.value.trim();
-  if (!name || !task) {
-    status.textContent = 'Пожалуйста, укажите имя и опишите задачу.';
-    (!name ? form.elements.name : form.elements.task).focus();
-    return null;
-  }
-  return { name, email: form.elements.email.value.trim(), task };
-}
-copyButton.addEventListener('click', async () => {
-  if (!form.reportValidity()) return;
-  const data = getInquiry();
-  if (!data) return;
-  const text = `Заявка для Анны\nИмя: ${data.name}\nEmail: ${data.email}\n\nЗадача:\n${data.task}`;
-  try {
-    await navigator.clipboard.writeText(text);
-    fallback.hidden = true;
-    status.textContent = 'Текст заявки скопирован. Копирование не отправляет заявку.';
-  } catch {
-    document.querySelector('#copy-text').value = text;
-    fallback.hidden = false;
-    status.textContent = 'Автоматическое копирование недоступно. Скопируйте текст ниже. Заявка не отправлена.';
-    document.querySelector('#copy-text').focus();
-    document.querySelector('#copy-text').select();
-  }
-});
-form.addEventListener('submit', event => {
-  event.preventDefault();
-  if (!form.reportValidity()) return;
-  const data = getInquiry();
-  if (!data) return;
-  const text = 'Заявка для Анны\nИмя: ' + data.name + '\nEmail: ' + data.email + '\n\nЗадача:\n' + data.task;
-  const subject = encodeURIComponent('Заявка на разработку — ' + data.name);
-  const body = encodeURIComponent(text);
-  status.textContent = 'Подтвердите отправку в своём почтовом приложении. Если оно не открылось, скопируйте заявку и отправьте на annay22_gav@mail.ru. Данные остаются в форме.';
-  window.location.href = 'mailto:annay22_gav@mail.ru?subject=' + subject + '&body=' + body;
-});
+dialog.addEventListener('close', () => { document.body.classList.remove('modal-open'); trigger?.focus(); });
 
 const menu = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('.navigation');
@@ -134,3 +89,5 @@ function animateRain(time) {
 window.addEventListener('resize', resizeRain);
 resizeRain();
 requestAnimationFrame(animateRain);
+
+

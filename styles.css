@@ -9,3 +9,7 @@
 @media(max-width:760px){.collection-intro{padding-top:12px}.collection-intro h3{font-size:20px}.tracker-work .work-info p{min-height:0}.tracker-preview img{aspect-ratio:auto}.tracker-work .work-info{padding:21px}.project-gallery{gap:16px}}
 .send-button{width:100%;margin-top:22px}.button:disabled{background:#91aed4;border-color:#91aed4;cursor:not-allowed;transform:none;box-shadow:none}.copy-button{display:block;width:fit-content;margin:14px auto 0;font-size:13px}.copy-button:disabled{opacity:.6;cursor:wait}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important}}
+
+/* Embedded Apps Script form; private sheet credentials never reach this site. */
+.inquiry-frame{display:block;width:100%;height:795px;border:0;background:#fff;border-radius:9px}#request-dialog{max-height:92dvh;overflow-y:auto}#request-dialog .form-footnote a{color:#176bb6;text-decoration:underline}#form-loading{min-height:18px}@media(max-width:600px){.inquiry-frame{height:850px}}
+#request-dialog .close-dialog{position:sticky;top:0;float:right;margin:0 0 0 8px;z-index:3;background:#edf6ff}
