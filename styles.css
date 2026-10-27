@@ -13,3 +13,7 @@
 /* Embedded Apps Script form; private sheet credentials never reach this site. */
 .inquiry-frame{display:block;width:100%;height:795px;border:0;background:#fff;border-radius:9px}#request-dialog{max-height:92dvh;overflow-y:auto}#request-dialog .form-footnote a{color:#176bb6;text-decoration:underline}#form-loading{min-height:18px}@media(max-width:600px){.inquiry-frame{height:850px}}
 #request-dialog .close-dialog{position:sticky;top:0;float:right;margin:0 0 0 8px;z-index:3;background:#edf6ff}
+
+/* Keep browser text-fragment links from painting highlighted lines on arrival. */
+::target-text{background-color:transparent;color:inherit;text-shadow:none}
+
